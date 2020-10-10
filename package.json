@@ -1,0 +1,23 @@
+{
+  "name": "blue-waves-nodejs-api",
+  "version": "1.0.0",
+  "description": "Blue Waves API. Get detailed information about beaches around the world.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "blue",
+    "waves",
+    "api"
+  ],
+  "author": "esentis",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "eslint": "^7.11.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.10.9",
+    "nodemon": "^2.0.4"
+  }
+}
