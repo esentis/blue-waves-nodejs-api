@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost/test', {
+mongoose.connect('mongodb://localhost/blue_waves', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 });

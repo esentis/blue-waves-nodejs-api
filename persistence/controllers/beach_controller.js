@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var Beach = require('../models/Beach.js');
+const escapeRegex = require('../helpers/escape_regex.js')
 
 router.get('/', async function (req, res) {
 
@@ -50,7 +51,7 @@ router.get('/', async function (req, res) {
 });
 
 router.get('/search/:term', async function (req, res) {
-    var term = req.params.term;
+    var term = escapeRegex(req.params.term);
     // Restricts search term's length to avoid unnecessary document reads.
     if (term.length <= 4) {
         res.status(404).json({ success: false, msg: "At least 4 characters are needed to perform search" });
