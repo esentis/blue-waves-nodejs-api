@@ -1,5 +1,7 @@
 # Blue Waves Nodejs API
 
+![Alt text](https://img.shields.io/badge/version-0.0.1-red?style=for-the-badge&logo=mongodb)
+
 ## Overview
 <img src="/screenshots/bluewaves.png" alt="drawing" width="500"/>
 
