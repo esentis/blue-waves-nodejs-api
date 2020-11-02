@@ -37,10 +37,10 @@ router.get('/', async function (req, res) {
         }
         // If page exists, we limit the results and show the page accordingly.
     } else {
-        const ads = await Beach.find().limit(limit * 1).skip((page - 1) * limit).exec();
+        const beaches = await Beach.find().limit(limit * 1).skip((page - 1) * limit).exec();
         beachesDto = [];
-        ads.forEach(ad => {
-            beachesDto.push(ad.toDto());
+        beaches.forEach(beach => {
+            beachesDto.push(beach.toDto());
         })
         res.json({
             beaches: beachesDto,
@@ -50,8 +50,19 @@ router.get('/', async function (req, res) {
     }
 });
 
-router.get('/search/:term', async function (req, res) {
-    var term = escapeRegex(req.params.term);
+router.get('/all', async function (req, res) {
+    const beaches = await Beach.find().exec();
+    beachesDto = [];
+    beaches.forEach(beach => {
+        beachesDto.push(beach.toDto());
+    });
+    res.json({
+        beaches: beachesDto,
+    });
+});
+
+router.post('/search', async function (req, res) {
+    var term = escapeRegex(req.body.term);
     // Restricts search term's length to avoid unnecessary document reads.
     if (term.length <= 4) {
         res.status(404).json({ success: false, msg: "At least 4 characters are needed to perform search" });
@@ -69,12 +80,17 @@ router.post('/add', async function (req, res) {
         name: req.body.name,
         description: req.body.description,
         latitude: req.body.latitude,
-        longtitude: req.body.longtitude,
-        img: req.body.img,
+        longitude: req.body.longitude,
+        images: req.body.images,
     })
     await newBeach.save(function (err, newAdd) {
-        if (err) return res.status(400).json({ success: false, msg: err });
-        res.status(201).json({ success: true, createdAt: (req.get('host') + req.baseUrl + '/' + newAdd._id) });
+        if (err) {
+            console.log(err);
+            return res.status(400).json({ success: false, msg: err });
+        } else {
+            res.status(201).json({ success: true, createdAt: (req.get('host') + req.baseUrl + '/' + newAdd._id) });
+        }
+
 
     });
 });
