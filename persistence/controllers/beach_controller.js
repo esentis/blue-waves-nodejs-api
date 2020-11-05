@@ -1,10 +1,10 @@
 var express = require('express');
 var router = express.Router();
 var Beach = require('../models/Beach.js');
+
 const escapeRegex = require('../helpers/escape_regex.js')
 
 router.get('/', async function (req, res) {
-
     // Destructures page and limit and set default values if not provided.
     var { page = 1, limit = 10 } = req.query;
 
@@ -24,10 +24,10 @@ router.get('/', async function (req, res) {
         if (req.query.page > totalpages) {
             res.status(404).json({ success: false, msg: `Page ${req.query.page} doesn't exist` }).end();
         } else {
-            const ads = await Beach.find().limit(limit * 1).skip((page - 1) * limit).exec();
+            const beaches = await Beach.find().limit(limit * 1).skip((page - 1) * limit).exec();
             var beachesDto = [];
-            ads.forEach(ad => {
-                beachesDto.push(ad.toDto());
+            beaches.forEach(beach => {
+                beachesDto.push(beach.toDto());
             })
             res.json({
                 beaches: beachesDto,
@@ -52,12 +52,9 @@ router.get('/', async function (req, res) {
 
 router.get('/all', async function (req, res) {
     const beaches = await Beach.find().exec();
-    beachesDto = [];
-    beaches.forEach(beach => {
-        beachesDto.push(beach.toDto());
-    });
+
     res.json({
-        beaches: beachesDto,
+        beaches: beaches,
     });
 });
 
