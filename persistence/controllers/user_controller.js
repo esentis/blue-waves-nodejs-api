@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router();
 var User = require('../models/User.js');
 
+const logger = require('../helpers/loggers.js');
+
 router.post('/add', async function (req, res) {
 
     const newUser = new User({
@@ -14,9 +16,10 @@ router.post('/add', async function (req, res) {
 
     await newUser.save(function (err, newAdd) {
         if (err) {
-            console.log(err);
+            logger.error(`Something went wrong ! ${err}`);
             return res.status(400).json({ success: false, msg: err });
         } else {
+            logger.error(`New user created at ${req.get('host') + req.baseUrl + '/' + newAdd._id}`);
             res.status(201).json({ success: true, createdAt: (req.get('host') + req.baseUrl + '/' + newAdd._id) });
         }
     });
@@ -25,14 +28,17 @@ router.post('/add', async function (req, res) {
 router.post('/delete/', async function (req, res) {
 
     await User.findOneAndDelete({ id: req.body.id })
-        .exec(function (err, ad) {
+        .exec(function (err, user) {
             if (err) {
+                logger.error(`Something went wrong ! ${err}`);
                 res.status(400).json({ success: false, msg: err });
             }
-            else if (!ad) {
-                res.status(404).json({ success: false, msg: 'User not found' });
+            else if (!user) {
+                logger.error(`User not found in database.`);
+                res.status(404).json({ success: false, msg: 'User not found in database.' });
             } else {
-                res.json({ success: true, msg: 'User deleted' });
+                logger.success(`User successfuly deleted.`);
+                res.json({ success: true, msg: 'User successfuly deleted.' });
             }
 
         });
