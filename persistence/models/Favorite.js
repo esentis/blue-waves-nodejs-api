@@ -1,8 +1,8 @@
 var mongoose = require('mongoose');
 
 const favoriteSchema = new mongoose.Schema({
-    beachId: { type: String, required: [true, 'Name is required'] },
-    userId: { type: String, required: [true, 'Name is required'] },
+    beachId: { type: String, required: [true, 'Beach ID is required'] },
+    userId: { type: String, required: [true, 'User ID is required'] },
 });
 
 favoriteSchema.methods.toDto = function () {

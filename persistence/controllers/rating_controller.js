@@ -38,7 +38,7 @@ router.post('/search', async function (req, res) {
         res.status(404).json({ success: false, msg: "At least 4 characters are needed to perform search" });
     } else {
         var ratings = await Rating.find({ 'beachId': beachId }).exec();
-        logger.info(`Found ${ratings.length} favorited beaches.`);
+        logger.info(`Beach has ${ratings.length} ratings.`);
         res.json({
             results: ratings
         });
