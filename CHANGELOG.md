@@ -1,47 +1,23 @@
-# 0.0.2
+# 0.0.3
+
+* Adds loggers.
+* New endpoints:
+  * /favorites
+    * /add **POST**
+    * /search **GET**
+
+## 0.0.2
 
 New endpoints:
 
 * /ratings
-  * /add POST request body:
-
-  ```json
-    "beachId": String,
-    "userId" : String,
-    "rating": Number
-    ```
-
-  * /search GET response body:
-
-  ```json
-    "results":[
-        {
-           "beachId": String,
-           "userId" : String,
-           "rating": Number
-        },
-        {
-           "beachId": String,
-           "userId" : String,
-           "rating": Number
-        },
-    ]
-  ```
+  * /add **POST**
+  * /search **GET**
 
 * /users
-  * /add POST request body:
+  * /add **POST**
 
-  ```json
-    "username": String,
-    "id": String,
-    "joinDate": String,
-    ```
-
-  * /delete POST request body:
-
-  ```json
-    "userId": String,
-  ```
+  * /delete **POST**
 
 ## 0.0.1
 
