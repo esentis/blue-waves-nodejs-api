@@ -9,7 +9,6 @@ require("./db_connection.js");
 
 const app = express();
 
-// create application/json parser
 app.use(express.json());
 
 app.use("/git", git);
