@@ -64,6 +64,7 @@ router.get("/", async function (req, res) {
   }
 });
 
+// test
 router.get("/all", async function (req, res) {
   logger.info("Getting all beaches...");
   const beaches = await Beach.find().exec();
@@ -78,12 +79,10 @@ router.post("/search", async function (req, res) {
   // Restricts search term's length to avoid unnecessary document reads.
   if (term.length < 4) {
     logger.warn("At least 4 characters are needed to perform search");
-    res
-      .status(404)
-      .json({
-        success: false,
-        msg: "At least 4 characters are needed to perform search",
-      });
+    res.status(404).json({
+      success: false,
+      msg: "At least 4 characters are needed to perform search",
+    });
   } else {
     logger.info(`Searching for "${term}" in beaches`);
     // Performs a LIKE query with $regex. The 'i' at options makes it case insensitive
@@ -116,12 +115,10 @@ router.post("/add", async function (req, res) {
           req.get("host") + req.baseUrl + "/" + newAdd._id
         }`
       );
-      res
-        .status(201)
-        .json({
-          success: true,
-          createdAt: req.get("host") + req.baseUrl + "/" + newAdd._id,
-        });
+      res.status(201).json({
+        success: true,
+        createdAt: req.get("host") + req.baseUrl + "/" + newAdd._id,
+      });
     }
   });
 });
