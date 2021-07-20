@@ -8,7 +8,7 @@ var users = require("./persistence/controllers/user_controller.js");
 require("./db_connection.js");
 
 const app = express();
-// test hook
+
 app.use(express.json());
 app.use("/beaches", beaches);
 app.use("/ratings", ratings);
