@@ -1,5 +1,6 @@
 var express = require("express");
 var crypto = require("crypto");
+var cmd = require("node-cmd");
 var beaches = require("./persistence/controllers/beach_controller.js");
 var ratings = require("./persistence/controllers/rating_controller.js");
 var favorites = require("./persistence/controllers/favorite_controller.js");
