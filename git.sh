@@ -17,17 +17,22 @@ if [ "$origin_url" != "$GITHUB_URL" ]; then
   fi
 fi
 
+echo "Checking out master"
 # checkout master
 git checkout master
 
+echo "Fetching origin master"
 # fetch the newest code
 git fetch origin master
 
+echo "Hard reset origin/master"
 # hard reset
 git reset --hard origin/master
 
+echo "Force pulling"
 # force pull
 git pull origin master --force
 
+echo "Refreshes the editor"
 # refresh the editor
 refresh
