@@ -1,6 +1,8 @@
 var mongoose = require("mongoose");
 
-mongoose.connect("mongodb://localhost/blue_waves", {
+const uri = `mongodb+srv://esentis:${process.env.MONGODB_PASSWORD}@cluster0.rsv4x.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
+
+mongoose.connect(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
