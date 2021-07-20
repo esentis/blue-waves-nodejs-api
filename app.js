@@ -16,7 +16,7 @@ app.use("/favorites", favorites);
 app.use("/users", users);
 
 app.listen(3000, function () {
-  console.log("Express server listening on port ", 3000);
+  console.log("Express server listening on port ", process.env.PORT || 3000);
 });
 
 module.exports = app;
