@@ -1,17 +1,15 @@
+require("dotenv").config();
 var express = require("express");
 var beaches = require("./persistence/controllers/beach_controller.js");
 var ratings = require("./persistence/controllers/rating_controller.js");
 var favorites = require("./persistence/controllers/favorite_controller.js");
 var users = require("./persistence/controllers/user_controller.js");
-var git = require("./persistence/controllers/hook_controller.js");
 
 require("./db_connection.js");
 
 const app = express();
 
 app.use(express.json());
-
-app.use("/git", git);
 app.use("/beaches", beaches);
 app.use("/ratings", ratings);
 app.use("/favorites", favorites);
