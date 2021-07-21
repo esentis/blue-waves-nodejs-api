@@ -1,6 +1,7 @@
 var express = require("express");
 var router = express.Router();
 var Beach = require("../models/Beach.js");
+var Country = require("../models/Country.js");
 
 const logger = require("../helpers/loggers.js");
 
@@ -75,11 +76,18 @@ router.get("/all", async function (req, res) {
 });
 
 router.post("/search", async function (req, res) {
+  if (req.body.term == null) {
+    logger.warn("At least 4 characters are needed to perform search");
+    return res.status(400).json({
+      success: false,
+      msg: "At least 4 characters are needed to perform search",
+    });
+  }
   var term = escapeRegex(req.body.term);
   // Restricts search term's length to avoid unnecessary document reads.
   if (term.length < 4) {
     logger.warn("At least 4 characters are needed to perform search");
-    res.status(404).json({
+    res.status(400).json({
       success: false,
       msg: "At least 4 characters are needed to perform search",
     });
@@ -104,7 +112,26 @@ router.post("/add", async function (req, res) {
     latitude: req.body.latitude,
     longitude: req.body.longitude,
     images: req.body.images,
+    countryId: req.body.countryId,
   });
+
+  try {
+    var country = await Country.findById(req.body.countryId);
+
+    if (country == null) {
+      logger.error("Country not found.");
+      return res.status(400).json({
+        success: false,
+        message: "Country not found.",
+      });
+    }
+  } catch (e) {
+    logger.error(e.message);
+    return res.status(400).json({
+      success: false,
+      message: `No country found with ID ${req.body.countryId}`,
+    });
+  }
   await newBeach.save(function (err, newAdd) {
     if (err) {
       logger.error(`Cannot add beach ! ${err}`);
