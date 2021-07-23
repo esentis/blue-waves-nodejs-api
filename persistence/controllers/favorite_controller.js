@@ -1,10 +1,12 @@
 var express = require("express");
 var router = express.Router();
 var Favorite = require("../models/Favorite.js");
+var Beach = require("../models/Beach.js");
+var User = require("../models/User.js");
 
 const logger = require("../helpers/loggers.js");
 
-router.post("/add", async function (req, res) {
+router.post("/", async function (req, res) {
   var favorite = await Favorite.findOne({
     beachId: req.body.beachId,
     userId: req.body.userId,
@@ -20,15 +22,39 @@ router.post("/add", async function (req, res) {
         logger.error(`User has no favorites.`);
       } else {
         logger.warn(`Beach has been removed from favorites list.`);
-        return res
-          .status(204)
-          .json({
-            success: false,
-            msg: "Beach has been removed from favorites.",
-          });
+        return res.status(204).json({
+          success: false,
+          msg: "Beach has been removed from favorites.",
+        });
       }
     });
   } else {
+    var user;
+
+    try {
+      user = await User.findById(req.body.userId);
+      console.log(beach);
+    } catch (e) {
+      logger.error(`No user found with ID ${req.body.userId}`);
+      return res.status(400).json({
+        success: false,
+        msg: `No user found with ID ${req.body.userId}`,
+      });
+    }
+
+    var beach;
+
+    try {
+      beach = await Beach.findById(req.body.beachId);
+      console.log(beach);
+    } catch (e) {
+      logger.error(`No beach found with ID ${req.body.beachId}`);
+      return res.status(400).json({
+        success: false,
+        msg: `No beach found with ID ${req.body.beachId}`,
+      });
+    }
+
     const newFavorite = new Favorite({
       beachId: req.body.beachId,
       userId: req.body.userId,
@@ -40,12 +66,10 @@ router.post("/add", async function (req, res) {
         return res.status(400).json({ success: false, msg: err });
       } else {
         logger.success(`Beach with ID ${req.body.beachId} has been favorited`);
-        res
-          .status(201)
-          .json({
-            success: true,
-            createdAt: req.get("host") + req.baseUrl + "/" + newAdd._id,
-          });
+        res.status(201).json({
+          success: true,
+          createdAt: req.get("host") + req.baseUrl + "/" + newAdd._id,
+        });
       }
     });
   }
@@ -58,12 +82,10 @@ router.post("/search", async function (req, res) {
   // Restricts search term's length to avoid unnecessary document reads.
   if (userId.length <= 4) {
     logger.error(`At least 4 characters are needed to perform search`);
-    res
-      .status(404)
-      .json({
-        success: false,
-        msg: "At least 4 characters are needed to perform search",
-      });
+    res.status(404).json({
+      success: false,
+      msg: "At least 4 characters are needed to perform search",
+    });
   } else {
     var favorites = await Favorite.find({
       userId: userId,
