@@ -1,4 +1,5 @@
 var mongoose = require("mongoose");
+const logger = require("./persistence/helpers/loggers.js");
 
 const uri = `mongodb+srv://esentis:${process.env.MONGODB_PASSWORD}@cluster0.rsv4x.mongodb.net/blue_waves?retryWrites=true&w=majority`;
 const localhost = "mongodb://127.0.0.1:27017/blue_waves";
@@ -10,7 +11,7 @@ mongoose.connect(localhost, {
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", function () {
-  console.log("Connected to db");
+  logger.info("Database connection established.");
 });
 
 module.exports = db;
