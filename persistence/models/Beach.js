@@ -17,15 +17,6 @@ const beachSchema = new mongoose.Schema({
   longitude: { type: Number, required: [true, "Longtitude is required"] },
 });
 
-beachSchema.methods.toDto = function () {
-  return {
-    name: this.name,
-    description: this.description,
-    latitude: this.latitude,
-    longitude: this.longitude,
-    images: this.images,
-  };
-};
 const Beach = mongoose.model("Beach", beachSchema);
 
 module.exports = Beach;

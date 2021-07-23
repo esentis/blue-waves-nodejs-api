@@ -5,8 +5,14 @@ var Beach = require("../models/Beach.js");
 var User = require("../models/User.js");
 
 const logger = require("../helpers/loggers.js");
+const checkApiKey = require("../helpers/check_apiKey.js");
 
+// Adds a beach to favorites
 router.post("/", async function (req, res) {
+  if (!checkApiKey(req.headers.authorization)) {
+    logger.error("Unauthorized.");
+    return res.status(401).json({ success: false, message: "Unauthorized." });
+  }
   var favorite = await Favorite.findOne({
     beachId: req.body.beachId,
     userId: req.body.userId,
@@ -33,7 +39,6 @@ router.post("/", async function (req, res) {
 
     try {
       user = await User.findById(req.body.userId);
-      console.log(beach);
     } catch (e) {
       logger.error(`No user found with ID ${req.body.userId}`);
       return res.status(400).json({
@@ -42,11 +47,8 @@ router.post("/", async function (req, res) {
       });
     }
 
-    var beach;
-
     try {
       beach = await Beach.findById(req.body.beachId);
-      console.log(beach);
     } catch (e) {
       logger.error(`No beach found with ID ${req.body.beachId}`);
       return res.status(400).json({
@@ -75,33 +77,89 @@ router.post("/", async function (req, res) {
   }
 });
 
-// Searches for a specific user's favorited beaches.
-router.post("/search", async function (req, res) {
+router.delete("/", async function (req, res) {
+  if (!checkApiKey(req.headers.authorization)) {
+    logger.error("Unauthorized.");
+    return res.status(401).json({ success: false, message: "Unauthorized." });
+  }
   var userId = req.body.userId;
   var beachId = req.body.beachId;
-  // Restricts search term's length to avoid unnecessary document reads.
-  if (userId.length <= 4) {
-    logger.error(`At least 4 characters are needed to perform search`);
-    res.status(404).json({
-      success: false,
-      msg: "At least 4 characters are needed to perform search",
-    });
-  } else {
-    var favorites = await Favorite.find({
-      userId: userId,
-      beachId: beachId,
-    }).exec();
-    logger.warn(
-      `${
-        favorites.length == 0
-          ? "Beach is not favorited by the user."
-          : "Beach is favorited."
-      }`
-    );
-    res.json({
-      results: favorites,
-    });
+  if (userId == null || beachId == null) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Missing required fields" });
   }
+
+  await Favorite.deleteOne({ beachId: beachId, userId: userId }).exec(function (
+    err,
+    status
+  ) {
+    if (status["deletedCount"] == 0) {
+      return res.status(400).json({ message: "Favorite not deleted" });
+    } else {
+      return res.status(204);
+    }
+  });
+});
+
+// Checks if beach is favorited  by the user
+router.post("/check", async function (req, res) {
+  if (!checkApiKey(req.headers.authorization)) {
+    logger.error("Unauthorized.");
+    return res.status(401).json({ success: false, message: "Unauthorized." });
+  }
+  var userId = req.body.userId;
+  var beachId = req.body.beachId;
+  if (userId == null || beachId == null) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Missing required fields" });
+  }
+  var favorites = await Favorite.find({
+    userId: userId,
+    beachId: beachId,
+  }).exec();
+  logger.warn(
+    `${
+      favorites.length == 0
+        ? "Beach is not favorited by the user."
+        : "Beach is favorited."
+    }`
+  );
+  res.json({
+    results: favorites.length > 0,
+  });
+});
+
+// Returns all user's personal favorite beaches
+router.post("/personal", async function (req, res) {
+  if (!checkApiKey(req.headers.authorization)) {
+    logger.error("Unauthorized.");
+    return res.status(401).json({ success: false, message: "Unauthorized." });
+  }
+
+  var userId = req.body.userId;
+  var beachId = req.body.beachId;
+
+  if (userId == null || beachId == null) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Missing required fields" });
+  }
+  var favorites = await Favorite.find({
+    userId: userId,
+    beachId: beachId,
+  }).exec();
+  logger.warn(
+    `${
+      favorites.length == 0
+        ? "Beach is not favorited by the user."
+        : "Beach is favorited."
+    }`
+  );
+  res.json({
+    results: favorites,
+  });
 });
 
 module.exports = router;

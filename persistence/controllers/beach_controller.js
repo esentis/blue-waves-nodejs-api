@@ -6,8 +6,14 @@ var Country = require("../models/Country.js");
 const logger = require("../helpers/loggers.js");
 
 const escapeRegex = require("../helpers/escape_regex.js");
+const checkApiKey = require("../helpers/check_apiKey.js");
 
 router.get("/", async function (req, res) {
+  if (!checkApiKey(req.headers.authorization)) {
+    logger.error("Unauthorized.");
+    return res.status(401).json({ success: false, message: "Unauthorized." });
+  }
+
   // Destructures page and limit and set default values if not provided.
   var { page = 1, limit = 10 } = req.query;
 
@@ -34,14 +40,12 @@ router.get("/", async function (req, res) {
       const beaches = await Beach.find()
         .limit(limit * 1)
         .skip((page - 1) * limit)
+        .select("-__v")
         .exec();
-      var beachesDto = [];
-      beaches.forEach((beach) => {
-        beachesDto.push(beach.toDto());
-      });
+
       logger.info(`Total beaches found ${count}. Showing page ${page}.`);
       res.json({
-        beaches: beachesDto,
+        beaches: beaches,
         totalPages: totalpages,
         currentPage: page,
       });
@@ -51,31 +55,23 @@ router.get("/", async function (req, res) {
     const beaches = await Beach.find()
       .limit(limit * 1)
       .skip((page - 1) * limit)
+      .select("-__v")
       .exec();
-    beachesDto = [];
-    beaches.forEach((beach) => {
-      beachesDto.push(beach.toDto());
-    });
+
     logger.info(`Total beaches found ${count}. Showing page ${page}.`);
     res.json({
-      beaches: beachesDto,
+      beaches: beaches,
       totalPages: totalpages,
       currentPage: page,
     });
   }
 });
 
-// test
-router.get("/all", async function (req, res) {
-  logger.info("Getting all beaches...");
-  const beaches = await Beach.find().exec();
-  logger.info(`Found ${beaches.length} beaches!`);
-  res.json({
-    beaches: beaches,
-  });
-});
-
 router.post("/search", async function (req, res) {
+  if (!checkApiKey(req.headers.authorization)) {
+    logger.error("Unauthorized.");
+    return res.status(401).json({ success: false, message: "Unauthorized." });
+  }
   if (req.body.term == null) {
     logger.warn("At least 4 characters are needed to perform search");
     return res.status(400).json({
@@ -106,6 +102,10 @@ router.post("/search", async function (req, res) {
 });
 
 router.post("/add", async function (req, res) {
+  if (!checkApiKey(req.headers.authorization)) {
+    logger.error("Unauthorized.");
+    return res.status(401).json({ success: false, message: "Unauthorized." });
+  }
   const newBeach = new Beach({
     name: req.body.name,
     description: req.body.description,
@@ -151,6 +151,10 @@ router.post("/add", async function (req, res) {
 });
 
 router.delete("/delete/:id", function (req, res) {
+  if (!checkApiKey(req.headers.authorization)) {
+    logger.error("Unauthorized.");
+    return res.status(401).json({ success: false, message: "Unauthorized." });
+  }
   logger.info(`Trying to delete beach with ID ${req.params.id}`);
   Beach.findOneAndDelete({ _id: req.params.id }).exec(function (err, ad) {
     if (err) {

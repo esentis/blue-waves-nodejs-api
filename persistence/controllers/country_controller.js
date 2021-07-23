@@ -6,6 +6,10 @@ const escapeRegex = require("../helpers/escape_regex.js");
 const logger = require("../helpers/loggers.js");
 
 router.post("/add", async function (req, res) {
+  if (!checkApiKey(req.headers.authorization)) {
+    logger.error("Unauthorized.");
+    return res.status(401).json({ success: false, message: "Unauthorized." });
+  }
   var country = await Country.findOne({
     name: req.body.name,
   }).exec();
@@ -39,6 +43,10 @@ router.post("/add", async function (req, res) {
 });
 
 router.get("/:id", async function (req, res) {
+  if (!checkApiKey(req.headers.authorization)) {
+    logger.error("Unauthorized.");
+    return res.status(401).json({ success: false, message: "Unauthorized." });
+  }
   var countryId = req.params.id;
   try {
     var country = await Country.findById(req.params.id);
@@ -54,6 +62,10 @@ router.get("/:id", async function (req, res) {
 
 // Searches for a specific country
 router.post("/search", async function (req, res) {
+  if (!checkApiKey(req.headers.authorization)) {
+    logger.error("Unauthorized.");
+    return res.status(401).json({ success: false, message: "Unauthorized." });
+  }
   var term = escapeRegex(req.body.term);
   // Restricts search term's length to avoid unnecessary document reads.
   if (term.length < 4) {

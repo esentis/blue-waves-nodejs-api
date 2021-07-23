@@ -6,7 +6,24 @@ var User = require("../models/User.js");
 
 const logger = require("../helpers/loggers.js");
 
+const checkApiKey = require("../helpers/check_apiKey.js");
+
 router.post("/", async function (req, res) {
+  if (!checkApiKey(req.headers.authorization)) {
+    logger.error("Unauthorized.");
+    return res.status(401).json({ success: false, message: "Unauthorized." });
+  }
+  var user;
+
+  try {
+    user = await User.findById(req.body.userId);
+  } catch (e) {
+    logger.error(`No user found with ID ${req.body.userId}`);
+    return res.status(400).json({
+      success: false,
+      msg: `No user found with ID ${req.body.userId}`,
+    });
+  }
   var rating = await Rating.findOne({
     beachId: req.body.beachId,
     userId: req.body.userId,
@@ -20,24 +37,10 @@ router.post("/", async function (req, res) {
       .json({ success: false, msg: "You have already rated !" });
   }
 
-  var user;
-
-  try {
-    user = await User.findById(req.body.userId);
-    console.log(beach);
-  } catch (e) {
-    logger.error(`No user found with ID ${req.body.userId}`);
-    return res.status(400).json({
-      success: false,
-      msg: `No user found with ID ${req.body.userId}`,
-    });
-  }
-
   var beach;
 
   try {
     beach = await Beach.findById(req.body.beachId);
-    console.log(beach);
   } catch (e) {
     logger.error(`No beach found with ID ${req.body.beachId}`);
     return res.status(400).json({
@@ -50,6 +53,7 @@ router.post("/", async function (req, res) {
     beachId: req.body.beachId,
     rating: req.body.rating,
     userId: req.body.userId,
+    review: req.body.review,
   });
 
   await newRating.save(function (err, newAdd) {
@@ -66,22 +70,64 @@ router.post("/", async function (req, res) {
   });
 });
 
-router.post("/search", async function (req, res) {
-  var beachId = req.body.beachId;
-  // Restricts search term's length to avoid unnecessary document reads.
-  if (beachId.length <= 4) {
-    logger.error(`At least 4 characters are needed to perform search`);
-    res.status(404).json({
-      success: false,
-      msg: "At least 4 characters are needed to perform search",
-    });
-  } else {
-    var ratings = await Rating.find({ beachId: beachId }).exec();
-    logger.info(`Beach has ${ratings.length} ratings.`);
-    res.json({
-      results: ratings,
-    });
+// Checks if beach is rated  by the user
+router.post("/check", async function (req, res) {
+  if (!checkApiKey(req.headers.authorization)) {
+    logger.error("Unauthorized.");
+    return res.status(401).json({ success: false, message: "Unauthorized." });
   }
+  var userId = req.body.userId;
+  var beachId = req.body.beachId;
+  if (userId == null || beachId == null) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Missing required fields" });
+  }
+  var ratings = await Rating.find({
+    userId: userId,
+    beachId: beachId,
+  }).exec();
+  logger.warn(
+    `${
+      ratings.length == 0
+        ? "Beach is not rated by the user."
+        : "Beach is rated."
+    }`
+  );
+  res.json({
+    results: ratings.length > 0,
+  });
+});
+
+// Returns all user's personal rated beaches
+router.post("/personal", async function (req, res) {
+  if (!checkApiKey(req.headers.authorization)) {
+    logger.error("Unauthorized.");
+    return res.status(401).json({ success: false, message: "Unauthorized." });
+  }
+
+  var userId = req.body.userId;
+  var beachId = req.body.beachId;
+
+  if (userId == null || beachId == null) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Missing required fields" });
+  }
+  var ratings = await Rating.find({
+    userId: userId,
+    beachId: beachId,
+  }).exec();
+  logger.warn(
+    `${
+      ratings.length == 0
+        ? "Beach is not favorited by the user."
+        : "Beach is favorited."
+    }`
+  );
+  res.json({
+    results: ratings,
+  });
 });
 
 module.exports = router;
