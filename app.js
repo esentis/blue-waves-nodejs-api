@@ -1,4 +1,6 @@
 require("dotenv").config();
+const path = require("path");
+const logger = require("./persistence/helpers/loggers.js");
 var express = require("express");
 var beaches = require("./persistence/controllers/beach_controller.js");
 var ratings = require("./persistence/controllers/rating_controller.js");
@@ -10,6 +12,10 @@ require("./db_connection.js");
 
 const app = express();
 
+app.get("/", function (req, res) {
+  return res.sendFile(path.join(__dirname, "views/index.html"));
+});
+
 app.use(express.json());
 app.use("/beaches", beaches);
 app.use("/countries", countries);
@@ -18,7 +24,7 @@ app.use("/favorites", favorites);
 app.use("/users", users);
 
 app.listen(process.env.PORT || 3000, function () {
-  console.log("Express server listening on port ", process.env.PORT || 3000);
+  logger.info(`Express server listening on port ${process.env.PORT || 3000}`);
 });
 
 module.exports = app;
