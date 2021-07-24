@@ -2,9 +2,11 @@ var express = require("express");
 var router = express.Router();
 var Beach = require("../models/Beach.js");
 var Country = require("../models/Country.js");
+var Image = require("../models/Image.js");
+var User = require("../models/User.js");
 
 const logger = require("../helpers/loggers.js");
-
+const ObjectId = require("mongodb").ObjectID;
 const escapeRegex = require("../helpers/escape_regex.js");
 const checkApiKey = require("../helpers/check_apiKey.js");
 
@@ -24,7 +26,7 @@ router.get("/", async function (req, res) {
   if (req.query.page == "") {
     page = 1;
   }
-  // Gets total documents in the Ads collection.
+  // Gets total documents in the Beaches collection.
   const count = await Beach.countDocuments();
   var totalpages = Math.ceil(count / limit);
 
@@ -101,7 +103,7 @@ router.post("/search", async function (req, res) {
   }
 });
 
-router.post("/add", async function (req, res) {
+router.post("/", async function (req, res) {
   if (!checkApiKey(req.headers.authorization)) {
     logger.error("Unauthorized.");
     return res.status(401).json({ success: false, message: "Unauthorized." });
@@ -110,8 +112,7 @@ router.post("/add", async function (req, res) {
     name: req.body.name,
     description: req.body.description,
     latitude: req.body.latitude,
-    longitude: req.body.longitude,
-    images: req.body.images,
+    longtitude: req.body.longtitude,
     countryId: req.body.countryId,
   });
 
@@ -132,7 +133,9 @@ router.post("/add", async function (req, res) {
       message: `No country found with ID ${req.body.countryId}`,
     });
   }
-  await newBeach.save(function (err, newAdd) {
+  var images = req.body.images;
+
+  await newBeach.save(async function (err, newAdd) {
     if (err) {
       logger.error(`Cannot add beach ! ${err}`);
       return res.status(400).json({ success: false, msg: err });
@@ -142,30 +145,77 @@ router.post("/add", async function (req, res) {
           req.get("host") + req.baseUrl + "/" + newAdd._id
         }`
       );
+
       res.status(201).json({
         success: true,
         createdAt: req.get("host") + req.baseUrl + "/" + newAdd._id,
       });
     }
+    if (images != null) {
+      for (var i = 0; i < images.length; i++) {
+        var newImage = Image({
+          url: images[i],
+          beachId: newAdd._id,
+        });
+        await newImage.save(function (err, newImage) {
+          if (err) {
+            logger.error(`Image failed to save ${err.message}`);
+          } else {
+            logger.success(`Image added for beach ${newAdd._id}`);
+          }
+        });
+      }
+    }
   });
 });
 
-router.delete("/delete/:id", function (req, res) {
+router.delete("/:id", async function (req, res) {
   if (!checkApiKey(req.headers.authorization)) {
     logger.error("Unauthorized.");
     return res.status(401).json({ success: false, message: "Unauthorized." });
   }
-  logger.info(`Trying to delete beach with ID ${req.params.id}`);
-  Beach.findOneAndDelete({ _id: req.params.id }).exec(function (err, ad) {
+  if (req.body.userId == null || req.body.userId == "") {
+    return res
+      .status(400)
+      .json({ success: false, message: "User ID is required" });
+  }
+
+  await User.findById({ _id: req.body.userId }).exec(async function (
+    err,
+    user
+  ) {
     if (err) {
-      logger.error(`Cannot remove item ! ${err}`);
-      res.status(400).json({ success: false, msg: "Cannot remove item" });
-    } else if (!ad) {
-      logger.error(`No beach found with ID ${req.params.id}`);
-      res.status(404).json({ success: false, msg: "Beach not found" });
+      logger.error(`Something went wrong ! ${err}`);
+      res.status(400).json({ success: false, msg: err });
+    } else if (!user) {
+      logger.error(`${ObjectId(req.body.userId)} not found in database.`);
+      res
+        .status(404)
+        .json({ success: false, msg: "User not found in database." });
     } else {
-      logger.success("Beach deleted");
-      res.json({ success: true, msg: `Beach deleted` });
+      if (user.role == "admin") {
+        logger.warn("User is admin proceeding deletion");
+        logger.info(`Trying to delete beach with ID ${req.params.id}`);
+        await Beach.findOneAndDelete({ _id: req.params.id }).exec(function (
+          err,
+          ad
+        ) {
+          if (err) {
+            logger.error(`Cannot remove item ! ${err}`);
+            res.status(400).json({ success: false, msg: "Cannot remove item" });
+          } else if (!ad) {
+            logger.error(`No beach found with ID ${req.params.id}`);
+            res.status(404).json({ success: false, msg: "Beach not found" });
+          } else {
+            logger.success("Beach deleted");
+            res.json({ success: true, msg: `Beach deleted` });
+          }
+        });
+      } else {
+        return res
+          .status(401)
+          .json({ success: false, message: "Unauthorized" });
+      }
     }
   });
 });

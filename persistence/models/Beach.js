@@ -12,9 +12,8 @@ const beachSchema = new mongoose.Schema({
     minlength: [3, "Minimum characters required 25"],
     required: [true, "Description is required"],
   },
-  images: { type: [String], required: [true, "Images are required"] },
   latitude: { type: Number, required: [true, "Latitude is required"] },
-  longitude: { type: Number, required: [true, "Longtitude is required"] },
+  longtitude: { type: Number, required: [true, "Longtitude is required"] },
 });
 
 const Beach = mongoose.model("Beach", beachSchema);
