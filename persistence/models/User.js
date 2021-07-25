@@ -3,9 +3,9 @@ const { Schema } = mongoose;
 
 const UsersSchema = new Schema({
   username: { type: String, required: [true, "Username is required"] },
+  id: { type: String, required: [true, "ID is required"] },
   karma: Number,
   role: String,
-  id: String,
   joinDate: Date,
 });
 
