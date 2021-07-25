@@ -3,7 +3,7 @@ var router = express.Router();
 var Rating = require("../models/Rating.js");
 var Beach = require("../models/Beach.js");
 var User = require("../models/User.js");
-
+var mongoose = require("mongoose");
 const logger = require("../helpers/loggers.js");
 
 const checkApiKey = require("../helpers/check_apiKey.js");
@@ -13,6 +13,7 @@ router.post("/", async function (req, res) {
     logger.error("Unauthorized.");
     return res.status(401).json({ success: false, message: "Unauthorized." });
   }
+
   var user;
 
   try {
@@ -41,11 +42,21 @@ router.post("/", async function (req, res) {
 
   try {
     beach = await Beach.findById(req.body.beachId);
+
+    if (beach.ratingCount == null) {
+      beach.ratingCount = 1;
+      beach.totalRatingSum = req.body.rating;
+      beach.averageRating = req.body.rating;
+    } else {
+      beach.ratingCount++;
+      beach.totalRatingSum += req.body.rating;
+      beach.averageRating = beach.totalRatingSum / beach.ratingCount;
+    }
   } catch (e) {
-    logger.error(`No beach found with ID ${req.body.beachId}`);
+    logger.error(e.message);
     return res.status(400).json({
       success: false,
-      msg: `No beach found with ID ${req.body.beachId}`,
+      msg: e.message,
     });
   }
 
@@ -68,6 +79,7 @@ router.post("/", async function (req, res) {
       });
     }
   });
+  await beach.save();
 });
 
 // Checks if beach is rated  by the user

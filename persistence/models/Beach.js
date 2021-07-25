@@ -6,14 +6,17 @@ const beachSchema = new mongoose.Schema({
     minlength: [2, "Minimum characters required 2"],
     required: [true, "Name is required"],
   },
-  countryId: { type: String, required: [true, "Country ID is required"] },
+  countryId: String,
   description: {
     type: String,
     minlength: [3, "Minimum characters required 25"],
     required: [true, "Description is required"],
   },
-  latitude: { type: Number, required: [true, "Latitude is required"] },
-  longtitude: { type: Number, required: [true, "Longtitude is required"] },
+  averageRating: Number,
+  totalRatingSum: Number,
+  ratingCount: Number,
+  latitude: Number,
+  longtitude: Number,
 });
 
 const Beach = mongoose.model("Beach", beachSchema);
