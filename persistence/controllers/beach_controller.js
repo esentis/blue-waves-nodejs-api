@@ -69,6 +69,20 @@ router.get("/", async function (req, res) {
   }
 });
 
+router.get("/:id", async function (req, res) {
+  if (!checkApiKey(req.headers.authorization)) {
+    logger.error("Unauthorized.");
+    return res.status(401).json({ success: false, message: "Unauthorized." });
+  }
+  var beach = await Beach.findById(req.params.id).select("-__v");
+
+  if (beach == null) {
+    logger.error("Beach not found.");
+    return res.status(404).json({ success: false, message: "Beach not found" });
+  }
+  return res.status(200).json({ success: true, results: beach });
+});
+
 router.post("/search", async function (req, res) {
   if (!checkApiKey(req.headers.authorization)) {
     logger.error("Unauthorized.");
