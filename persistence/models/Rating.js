@@ -10,6 +10,7 @@ const ratingSchema = new mongoose.Schema({
     max: 10,
   },
   review: String,
+  date: Date,
 });
 
 ratingSchema.methods.toDto = function () {
@@ -18,6 +19,7 @@ ratingSchema.methods.toDto = function () {
     userId: this.userId,
     rating: this.rating,
     review: this.review,
+    date: this.date,
   };
 };
 const Rating = mongoose.model("Rating", ratingSchema);
