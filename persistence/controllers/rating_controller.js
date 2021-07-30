@@ -17,7 +17,7 @@ router.post("/", async function (req, res) {
   var user;
 
   try {
-    user = await User.findById(req.body.userId);
+    user = await User.findOne({ id: req.body.userId });
   } catch (e) {
     logger.error(`No user found with ID ${req.body.userId}`);
     return res.status(400).json({
@@ -65,6 +65,7 @@ router.post("/", async function (req, res) {
     rating: req.body.rating,
     userId: req.body.userId,
     review: req.body.review,
+    date: Date.now(),
   });
 
   await newRating.save(function (err, newAdd) {
