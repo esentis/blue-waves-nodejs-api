@@ -16,7 +16,7 @@ const beachSchema = new mongoose.Schema({
   totalRatingSum: Number,
   ratingCount: Number,
   latitude: Number,
-  longtitude: Number,
+  longitude: Number,
 });
 
 const Beach = mongoose.model("Beach", beachSchema);

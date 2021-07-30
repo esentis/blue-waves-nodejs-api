@@ -80,6 +80,7 @@ router.get("/:id", async function (req, res) {
     logger.error("Beach not found.");
     return res.status(404).json({ success: false, message: "Beach not found" });
   }
+  logger.info(`Beach found ${beach.name}`);
   return res.status(200).json({ success: true, results: beach });
 });
 
@@ -126,7 +127,7 @@ router.post("/", async function (req, res) {
     name: req.body.name,
     description: req.body.description,
     latitude: req.body.latitude,
-    longtitude: req.body.longtitude,
+    longitude: req.body.longitude,
     countryId: req.body.countryId,
   });
 
