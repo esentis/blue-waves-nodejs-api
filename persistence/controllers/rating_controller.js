@@ -3,7 +3,7 @@ var router = express.Router();
 var Rating = require("../models/Rating.js");
 var Beach = require("../models/Beach.js");
 var User = require("../models/User.js");
-var mongoose = require("mongoose");
+
 const logger = require("../helpers/loggers.js");
 
 const checkApiKey = require("../helpers/check_apiKey.js");
