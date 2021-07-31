@@ -7,6 +7,7 @@ var ratings = require("./persistence/controllers/rating_controller.js");
 var favorites = require("./persistence/controllers/favorite_controller.js");
 var users = require("./persistence/controllers/user_controller.js");
 var countries = require("./persistence/controllers/country_controller.js");
+var images = require("./persistence/controllers/image_controller.js");
 
 require("./db_connection.js");
 
@@ -22,6 +23,7 @@ app.use("/countries", countries);
 app.use("/ratings", ratings);
 app.use("/favorites", favorites);
 app.use("/users", users);
+app.use("/images", images);
 
 app.listen(process.env.PORT || 3000, function () {
   logger.info(`Express server listening on port ${process.env.PORT || 3000}`);
