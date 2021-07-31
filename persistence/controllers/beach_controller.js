@@ -74,7 +74,15 @@ router.get("/:id", async function (req, res) {
     logger.error("Unauthorized.");
     return res.status(401).json({ success: false, message: "Unauthorized." });
   }
-  var beach = await Beach.findById(req.params.id).select("-__v");
+  try {
+    var beach = await Beach.findById(req.params.id).select("-__v");
+  } catch (e) {
+    logger.e(e);
+    return res.status(404).json({
+      success: false,
+      message: "Beach not found",
+    });
+  }
 
   if (beach == null) {
     logger.error("Beach not found.");
@@ -133,19 +141,18 @@ router.post("/", async function (req, res) {
 
   try {
     var country = await Country.findById(req.body.countryId);
-
-    if (country == null) {
-      logger.error("Country not found.");
-      return res.status(400).json({
-        success: false,
-        message: "Country not found.",
-      });
-    }
   } catch (e) {
     logger.error(e.message);
     return res.status(400).json({
       success: false,
       message: `No country found with ID ${req.body.countryId}`,
+    });
+  }
+  if (country == null) {
+    logger.error("Country not found.");
+    return res.status(400).json({
+      success: false,
+      message: "Country not found.",
     });
   }
   var images = req.body.images;
