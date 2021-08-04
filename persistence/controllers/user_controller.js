@@ -57,6 +57,33 @@ router.post("/", async function (req, res) {
   );
 });
 
+router.post("/check", async function (req, res) {
+  if (!checkApiKey(req.headers.authorization)) {
+    logger.error("Unauthorized.");
+    return res.status(401).json({ success: false, message: "Unauthorized." });
+  }
+
+  if (req.body.id == null || req.body.id.length == 0) {
+    logger.error("Missing required parameters");
+    return res
+      .status(400)
+      .json({ success: false, message: "Missing required parameters" });
+  }
+
+  var user = await User.findOne({ id: req.body.id });
+
+  console.log(user);
+
+  if (user == null) {
+    logger.error("User not found");
+    return res.status(404).json({ success: false, message: "User not found" });
+  }
+
+  return res
+    .status(200)
+    .json({ success: true, message: "User found in database" });
+});
+
 // Delete a user
 router.delete("/", async function (req, res) {
   if (!checkApiKey(req.headers.authorization)) {
