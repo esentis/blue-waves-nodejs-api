@@ -25,6 +25,8 @@ router.post("/add", async function (req, res) {
       iso: req.body.iso,
       currency: req.body.currency,
       description: req.body.description,
+      latitude: req.body.latitude,
+      longitude: req.body.longitude,
     });
 
     await newCountry.save(function (err, newAdd) {
