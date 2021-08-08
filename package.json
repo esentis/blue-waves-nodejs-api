@@ -1,6 +1,6 @@
 {
   "name": "blue-waves-nodejs-api",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Blue Waves API. Get detailed information about beaches around the world.",
   "main": "app.js",
   "scripts": {
