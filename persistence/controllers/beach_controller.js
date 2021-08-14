@@ -132,8 +132,10 @@ router.post("/", async function (req, res) {
     return res.status(401).json({ success: false, message: "Unauthorized." });
   }
   const newBeach = new Beach({
-    name: req.body.name,
-    description: req.body.description,
+    name_el: req.body.name_el,
+    name_en: req.body.name_en,
+    description_el: req.body.description_el,
+    description_en: req.body.description_en,
     latitude: req.body.latitude,
     longitude: req.body.longitude,
     countryId: req.body.countryId,
