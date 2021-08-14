@@ -1,9 +1,7 @@
 var mongoose = require("mongoose");
 const logger = require("./persistence/helpers/loggers.js");
 
-const uri = `mongodb+srv://esentis:${process.env.MONGODB_PASSWORD}@cluster0.rsv4x.mongodb.net/blue_waves?retryWrites=true&w=majority`;
-const localhost = "mongodb://127.0.0.1:27017/blue_waves";
-mongoose.connect(localhost, {
+mongoose.connect(process.env["CONNECTION_STRING"], {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
