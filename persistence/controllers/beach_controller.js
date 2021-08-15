@@ -244,4 +244,32 @@ router.delete("/:id", async function (req, res) {
   });
 });
 
+/// This endpoint may serve for future field aditions
+router.post("/set", async function (req, res) {
+  // await Beach.updateMany(
+  //   {},
+  //   {
+  //     $set: {
+  //       name_el: "",
+  //       name_en: "",
+  //       description_el: "",
+  //       description_en: "",
+  //     },
+  //   }
+  // );
+  return res.status(200).json({ message: "Fields setted" });
+});
+/// This endpoint may serve for future field deletions
+router.post("/unset", async function (req, res) {
+  // await Beach.updateMany(
+  //   {},
+  //   {
+  //     $unset: {
+  //       name: 1,
+  //     },
+  //   }
+  // );
+  return res.status(200).json({ message: "Fields unsetted" });
+});
+
 module.exports = router;
